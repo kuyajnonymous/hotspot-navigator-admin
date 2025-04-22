@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { 
   Settings as SettingsIcon,
@@ -16,74 +15,46 @@ import {
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { RouterAPIStatus } from '@/lib/types';
-import { routerAPI } from '@/lib/api';
+import { useRouterAPI } from '@/hooks/useRouterAPI';
+import { RouterSettingsForm } from '@/components/settings/RouterSettingsForm';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Settings() {
-  const [loading, setLoading] = useState(true);
-  const [testingConnection, setTestingConnection] = useState(false);
   const [apiStatus, setApiStatus] = useState<RouterAPIStatus | null>(null);
-  
-  // Mock API status for demonstration
-  const mockApiStatus: RouterAPIStatus = {
-    status: 'connected',
-    router_ip: '192.168.1.1',
-    api_port: 8728,
-    username: 'admin',
-    api_enabled: true,
-    api_ssl_enabled: false,
-    ping_status: true,
-    permissions_valid: true,
-    last_checked: new Date().toISOString()
-  };
+  const { testConnection, testingConnection, updateRouterConnection } = useRouterAPI();
 
-  const loadApiStatus = async () => {
-    setLoading(true);
-    try {
-      // In a real implementation, this would call the API
-      // const response = await routerAPI.getStatus();
-      // setApiStatus(response.data);
+  const { data: connection, isLoading } = useQuery({
+    queryKey: ['router-connection'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('router_connections')
+        .select('*')
+        .limit(1)
+        .single();
       
-      // Using mock data for demonstration
-      setApiStatus(mockApiStatus);
-    } catch (error) {
-      console.error('Error loading API status:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const testConnection = async () => {
-    setTestingConnection(true);
-    try {
-      // In a real implementation, this would call the API
-      // const response = await routerAPI.testConnection();
-      // setApiStatus(response.data);
+      if (error) throw error;
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Convert to RouterAPIStatus format
+      const status: RouterAPIStatus = {
+        status: data.is_active ? 'connected' : 'disconnected',
+        router_ip: data.router_ip,
+        api_port: data.api_port,
+        username: data.api_username,
+        api_enabled: true,
+        api_ssl_enabled: data.api_ssl || false,
+        ping_status: data.is_active || false,
+        permissions_valid: true,
+        last_checked: data.last_connected || new Date().toISOString()
+      };
       
-      // Update mock data for demonstration
-      setApiStatus({
-        ...mockApiStatus,
-        last_checked: new Date().toISOString()
-      });
-      
-    } catch (error) {
-      console.error('Error testing connection:', error);
-    } finally {
-      setTestingConnection(false);
-    }
-  };
-
-  useEffect(() => {
-    loadApiStatus();
-  }, []);
+      setApiStatus(status);
+      return data;
+    },
+  });
 
   const StatusItem = ({ 
     title, 
@@ -117,6 +88,43 @@ export default function Settings() {
     </div>
   );
 
+  const handleTest = async () => {
+    if (!connection) return;
+    const result = await testConnection(connection.id);
+    if (result) {
+      setApiStatus(result);
+    }
+  };
+
+  const handleUpdate = async (data: Partial<RouterAPIStatus>) => {
+    if (!connection) return false;
+    const success = await updateRouterConnection(connection.id, data);
+    if (success && data) {
+      setApiStatus(prev => prev ? { ...prev, ...data } : null);
+    }
+    return success;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-8">
+        <RefreshCw className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!connection || !apiStatus) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <Wifi className="h-12 w-12 text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium">No Router Connection</h3>
+        <p className="text-muted-foreground">
+          Please add a router connection to get started
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -137,108 +145,50 @@ export default function Settings() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <RefreshCw className="h-6 w-6 animate-spin text-primary" />
+          <RouterSettingsForm
+            apiStatus={apiStatus}
+            connectionId={connection.id}
+            onUpdate={handleUpdate}
+            onTest={handleTest}
+            testingConnection={testingConnection}
+          />
+
+          <Separator className="my-6" />
+
+          <div className="rounded-md border border-border p-4">
+            <h3 className="text-lg font-medium mb-4">RouterOS API Checklist</h3>
+            <div className="space-y-1">
+              <StatusItem 
+                title="Connection Status" 
+                status={apiStatus?.status === 'connected'} 
+                description="API connection to your MikroTik router is active and working"
+              />
+              <Separator />
+              <StatusItem 
+                title="API Service Enabled" 
+                status={apiStatus?.api_enabled || false} 
+                description="The API service is enabled on your MikroTik router"
+              />
+              <Separator />
+              <StatusItem 
+                title="API SSL Service" 
+                status={apiStatus?.api_ssl_enabled || false} 
+                description="API SSL service is enabled for secure communication"
+              />
+              <Separator />
+              <StatusItem 
+                title="Ping Status" 
+                status={apiStatus?.ping_status || false} 
+                description="Your MikroTik router responds to ping requests"
+              />
+              <Separator />
+              <StatusItem 
+                title="Permissions" 
+                status={apiStatus?.permissions_valid || false} 
+                description="Your API user has the required permissions"
+              />
             </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 gap-y-6 gap-x-4 md:grid-cols-2 mb-6">
-                <div className="space-y-2">
-                  <Label htmlFor="router_ip">Router IP Address</Label>
-                  <Input 
-                    id="router_ip" 
-                    placeholder="192.168.1.1" 
-                    value={apiStatus?.router_ip}
-                    readOnly
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="api_port">API Port</Label>
-                  <Input 
-                    id="api_port" 
-                    placeholder="8728" 
-                    value={apiStatus?.api_port}
-                    readOnly
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
-                  <Input 
-                    id="username" 
-                    placeholder="admin" 
-                    value={apiStatus?.username}
-                    readOnly
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="last_checked">Last Checked</Label>
-                  <Input 
-                    id="last_checked" 
-                    value={apiStatus?.last_checked ? new Date(apiStatus.last_checked).toLocaleString() : 'Never'}
-                    readOnly
-                  />
-                </div>
-              </div>
-          
-              <Separator className="my-6" />
-          
-              <div className="rounded-md border border-border p-4 mb-6">
-                <h3 className="text-lg font-medium mb-4">RouterOS API Checklist</h3>
-                
-                <div className="space-y-1">
-                  <StatusItem 
-                    title="Connection Status" 
-                    status={apiStatus?.status === 'connected'} 
-                    description="API connection to your MikroTik router is active and working"
-                  />
-                  <Separator />
-                  <StatusItem 
-                    title="API Service Enabled" 
-                    status={apiStatus?.api_enabled || false} 
-                    description="The API service is enabled on your MikroTik router"
-                  />
-                  <Separator />
-                  <StatusItem 
-                    title="API SSL Service" 
-                    status={apiStatus?.api_ssl_enabled || false} 
-                    description="API SSL service is enabled for secure communication"
-                  />
-                  <Separator />
-                  <StatusItem 
-                    title="Ping Status" 
-                    status={apiStatus?.ping_status || false} 
-                    description="Your MikroTik router responds to ping requests"
-                  />
-                  <Separator />
-                  <StatusItem 
-                    title="Permissions" 
-                    status={apiStatus?.permissions_valid || false} 
-                    description="Your API user has the required permissions"
-                  />
-                </div>
-              </div>
-          
-              <div className="flex justify-end gap-4">
-                <Button 
-                  variant="outline" 
-                  onClick={() => window.location.href = "/edit-connection"} 
-                  className="flex items-center gap-2"
-                >
-                  <SettingsIcon className="h-4 w-4" />
-                  Edit Connection
-                </Button>
-                <Button 
-                  onClick={testConnection} 
-                  disabled={testingConnection} 
-                  className="flex items-center gap-2"
-                >
-                  <RefreshCw className={`h-4 w-4 ${testingConnection ? 'animate-spin' : ''}`} />
-                  Test Connection
-                </Button>
-              </div>
-            </>
-          )}
+          </div>
         </CardContent>
       </Card>
     </div>
