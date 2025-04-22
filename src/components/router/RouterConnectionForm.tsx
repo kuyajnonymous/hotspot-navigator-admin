@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface RouterConnectionFormProps {
   open: boolean;
@@ -32,6 +33,7 @@ export function RouterConnectionForm({ open, onClose }: RouterConnectionFormProp
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
     defaultValues: {
       api_port: 8728
@@ -41,9 +43,15 @@ export function RouterConnectionForm({ open, onClose }: RouterConnectionFormProp
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
+      // Add the user_id to the data object
+      const insertData = {
+        ...data,
+        user_id: user?.id
+      };
+
       const { error } = await supabase
         .from('router_connections')
-        .insert([data]);
+        .insert(insertData);
 
       if (error) throw error;
 

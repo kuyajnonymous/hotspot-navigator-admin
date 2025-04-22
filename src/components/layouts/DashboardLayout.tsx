@@ -14,7 +14,8 @@ import {
   Clock,
   Settings,
   Menu,
-  LogOut
+  LogOut,
+  WifiOff
 } from "lucide-react";
 
 interface NavItemProps {
