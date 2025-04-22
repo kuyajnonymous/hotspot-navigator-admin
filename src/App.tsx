@@ -10,6 +10,9 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/dashboard/Dashboard";
 import HotspotUsers from "./pages/hotspot/HotspotUsers";
+import PPPoEUsers from "./pages/pppoe/PPPoEUsers";
+import ConnectedDevices from "./pages/devices/ConnectedDevices";
+import FirewallRules from "./pages/firewall/FirewallRules";
 import Settings from "./pages/settings/Settings";
 import HotspotPortal from "./pages/hotspot/HotspotPortal";
 import AuthPage from "./pages/auth/AuthPage";
@@ -46,6 +49,9 @@ const App = () => (
           }>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/hotspot-users" element={<HotspotUsers />} />
+            <Route path="/pppoe-users" element={<PPPoEUsers />} />
+            <Route path="/devices" element={<ConnectedDevices />} />
+            <Route path="/firewall" element={<FirewallRules />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/router-connections" element={<RouterConnections />} />
           </Route>

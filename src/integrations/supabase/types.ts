@@ -9,6 +9,121 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      connected_devices: {
+        Row: {
+          bytes_in: number
+          bytes_out: number
+          comment: string | null
+          created_at: string
+          hostname: string | null
+          id: string
+          ip_address: string
+          mac_address: string
+          router_connection_id: string | null
+          status: string
+          updated_at: string
+          uptime: string
+          user_id: string
+        }
+        Insert: {
+          bytes_in?: number
+          bytes_out?: number
+          comment?: string | null
+          created_at?: string
+          hostname?: string | null
+          id?: string
+          ip_address: string
+          mac_address: string
+          router_connection_id?: string | null
+          status?: string
+          updated_at?: string
+          uptime?: string
+          user_id: string
+        }
+        Update: {
+          bytes_in?: number
+          bytes_out?: number
+          comment?: string | null
+          created_at?: string
+          hostname?: string | null
+          id?: string
+          ip_address?: string
+          mac_address?: string
+          router_connection_id?: string | null
+          status?: string
+          updated_at?: string
+          uptime?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connected_devices_router_connection_id_fkey"
+            columns: ["router_connection_id"]
+            isOneToOne: false
+            referencedRelation: "router_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      firewall_rules: {
+        Row: {
+          action: string
+          chain: string
+          comment: string | null
+          created_at: string
+          disabled: boolean
+          dst_address: string | null
+          dst_port: string | null
+          id: string
+          protocol: string | null
+          router_connection_id: string | null
+          src_address: string | null
+          src_port: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          chain: string
+          comment?: string | null
+          created_at?: string
+          disabled?: boolean
+          dst_address?: string | null
+          dst_port?: string | null
+          id?: string
+          protocol?: string | null
+          router_connection_id?: string | null
+          src_address?: string | null
+          src_port?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          chain?: string
+          comment?: string | null
+          created_at?: string
+          disabled?: boolean
+          dst_address?: string | null
+          dst_port?: string | null
+          id?: string
+          protocol?: string | null
+          router_connection_id?: string | null
+          src_address?: string | null
+          src_port?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "firewall_rules_router_connection_id_fkey"
+            columns: ["router_connection_id"]
+            isOneToOne: false
+            referencedRelation: "router_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hotspot_profiles: {
         Row: {
           created_at: string | null
@@ -59,6 +174,68 @@ export type Database = {
           },
         ]
       }
+      hotspot_users: {
+        Row: {
+          bytes_in: number
+          bytes_out: number
+          comment: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          mac_address: string | null
+          password: string | null
+          profile: string
+          router_connection_id: string | null
+          status: string
+          updated_at: string
+          uptime: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          bytes_in?: number
+          bytes_out?: number
+          comment?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          mac_address?: string | null
+          password?: string | null
+          profile: string
+          router_connection_id?: string | null
+          status?: string
+          updated_at?: string
+          uptime?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          bytes_in?: number
+          bytes_out?: number
+          comment?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          mac_address?: string | null
+          password?: string | null
+          profile?: string
+          router_connection_id?: string | null
+          status?: string
+          updated_at?: string
+          uptime?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hotspot_users_router_connection_id_fkey"
+            columns: ["router_connection_id"]
+            isOneToOne: false
+            referencedRelation: "router_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pppoe_profiles: {
         Row: {
           created_at: string | null
@@ -99,6 +276,68 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "pppoe_profiles_router_connection_id_fkey"
+            columns: ["router_connection_id"]
+            isOneToOne: false
+            referencedRelation: "router_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pppoe_users: {
+        Row: {
+          bytes_in: number
+          bytes_out: number
+          comment: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          mac_address: string | null
+          password: string | null
+          profile: string
+          router_connection_id: string | null
+          status: string
+          updated_at: string
+          uptime: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          bytes_in?: number
+          bytes_out?: number
+          comment?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          mac_address?: string | null
+          password?: string | null
+          profile: string
+          router_connection_id?: string | null
+          status?: string
+          updated_at?: string
+          uptime?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          bytes_in?: number
+          bytes_out?: number
+          comment?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          mac_address?: string | null
+          password?: string | null
+          profile?: string
+          router_connection_id?: string | null
+          status?: string
+          updated_at?: string
+          uptime?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pppoe_users_router_connection_id_fkey"
             columns: ["router_connection_id"]
             isOneToOne: false
             referencedRelation: "router_connections"
