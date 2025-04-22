@@ -49,6 +49,7 @@ export function DashboardLayout() {
 
   const navItems = [
     { icon: LayoutDashboard, title: "Dashboard", to: "/dashboard" },
+    { icon: WifiOff, title: "Router Connections", to: "/router-connections" },
     { icon: Users, title: "Hotspot Users", to: "/hotspot-users" },
     { icon: Wifi, title: "PPPoE Users", to: "/pppoe-users" },
     { icon: Database, title: "Connected Devices", to: "/devices" },

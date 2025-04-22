@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ import HotspotUsers from "./pages/hotspot/HotspotUsers";
 import Settings from "./pages/settings/Settings";
 import HotspotPortal from "./pages/hotspot/HotspotPortal";
 import AuthPage from "./pages/auth/AuthPage";
+import RouterConnections from "./pages/router/RouterConnections";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +46,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/hotspot-users" element={<HotspotUsers />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/router-connections" element={<RouterConnections />} />
           </Route>
           
           {/* Catch-all route */}

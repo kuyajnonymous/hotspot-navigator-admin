@@ -9,6 +9,103 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      hotspot_profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          idle_timeout: string | null
+          keepalive_timeout: string | null
+          name: string
+          rate_limit: string | null
+          router_connection_id: string | null
+          session_timeout: string | null
+          status: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          idle_timeout?: string | null
+          keepalive_timeout?: string | null
+          name: string
+          rate_limit?: string | null
+          router_connection_id?: string | null
+          session_timeout?: string | null
+          status?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          idle_timeout?: string | null
+          keepalive_timeout?: string | null
+          name?: string
+          rate_limit?: string | null
+          router_connection_id?: string | null
+          session_timeout?: string | null
+          status?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hotspot_profiles_router_connection_id_fkey"
+            columns: ["router_connection_id"]
+            isOneToOne: false
+            referencedRelation: "router_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pppoe_profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          local_address: string | null
+          name: string
+          only_one: boolean | null
+          rate_limit: string | null
+          remote_address: string | null
+          router_connection_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          local_address?: string | null
+          name: string
+          only_one?: boolean | null
+          rate_limit?: string | null
+          remote_address?: string | null
+          router_connection_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          local_address?: string | null
+          name?: string
+          only_one?: boolean | null
+          rate_limit?: string | null
+          remote_address?: string | null
+          router_connection_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pppoe_profiles_router_connection_id_fkey"
+            columns: ["router_connection_id"]
+            isOneToOne: false
+            referencedRelation: "router_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -36,6 +133,51 @@ export type Database = {
           role?: string | null
           updated_at?: string | null
           username?: string | null
+        }
+        Relationships: []
+      }
+      router_connections: {
+        Row: {
+          api_password: string | null
+          api_port: number
+          api_ssl: boolean | null
+          api_username: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_connected: string | null
+          name: string
+          router_ip: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          api_password?: string | null
+          api_port?: number
+          api_ssl?: boolean | null
+          api_username: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_connected?: string | null
+          name: string
+          router_ip: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          api_password?: string | null
+          api_port?: number
+          api_ssl?: boolean | null
+          api_username?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_connected?: string | null
+          name?: string
+          router_ip?: string
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
